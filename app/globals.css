@@ -1,24 +1,6 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
-
-body {
-  background: #07070f;
-  color: #EEEDFE;
-  -webkit-font-smoothing: antialiased;
-}
-
+body { background: #07070f; color: #EEEDFE; -webkit-font-smoothing: antialiased; }
 a { color: inherit; }
-
-textarea, input {
-  font-family: 'Noto Sans', sans-serif;
-}
-
-textarea:focus, input:focus {
-  border-color: #7F77DD !important;
-}
-
-button { transition: opacity 0.2s, transform 0.2s; }
-button:active { transform: scale(0.97); }
-
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: #07070f; }
 ::-webkit-scrollbar-thumb { background: #534AB7; border-radius: 2px; }
