@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 type Lang = "tk"|"ru"|"tr"|"en"
 const T:any={
   tk:{title:"Meniň profilim",edit:"Redaktirle",filled:"dolduryldy",add_photo:"Surat goş",name:"At",age:"Ýaş",city:"Şäher",about:"Özüň hakda",goal:"Tanyşlyk maksady",education:"Bilim",languages:"Diller",interests:"Gyzyklanmalar",appearance:"Daşky görnüş",body:"Beden görnüşi",height:"Boy",weight:"Agram",smoking:"Çilim",alcohol:"Alkogol",zodiac:"Zodiak",country:"Ýurt",save:"Sakla",saved:"Saklandi!",logout:"Çyk",not_set:"Görkezilmedi",vip:"GizlinDünya VIP",share:"Paýlaş",online:"Onlaýn",settings:"Sazlamalar"},
@@ -37,7 +37,6 @@ export default function CabinetPage(){
   const [alcohol,setAlcohol]=useState("")
   const [zodiac,setZodiac]=useState("")
   const [expandSection,setExpandSection]=useState<string|null>(null)
-  const fileRefs=useRef<(HTMLInputElement|null)[]>([])
   const t=T[lang]
   useEffect(()=>{
     const s=localStorage.getItem("gd_user")
@@ -110,14 +109,14 @@ export default function CabinetPage(){
           {/* PHOTOS GRID */}
           <div style={{display:"grid",gridTemplateColumns:"2fr 1fr 1fr",gridTemplateRows:"auto auto",gap:6,padding:"0 16px",marginBottom:8}}>
             {photos.map((photo,i)=>(
-              <div key={i} onClick={()=>editing&&fileRefs.current[i]?.click()} style={{gridColumn:i===0?"1":"auto",gridRow:i===0?"1 / 3":"auto",background:photo?`url(${photo}) center/cover`:"#f5f5f5",borderRadius:12,aspectRatio:i===0?"1/1.4":"1/1",display:"flex",alignItems:"center",justifyContent:"center",cursor:editing?"pointer":"default",overflow:"hidden",border:"1px solid #eee",backgroundSize:"cover",position:"relative"}}>
+              <div key={i} onClick={()=>editing&&(document.getElementById(`photo-${i}`) as HTMLInputElement)?.click()} style={{gridColumn:i===0?"1":"auto",gridRow:i===0?"1 / 3":"auto",background:photo?`url(${photo}) center/cover`:"#f5f5f5",borderRadius:12,aspectRatio:i===0?"1/1.4":"1/1",display:"flex",alignItems:"center",justifyContent:"center",cursor:editing?"pointer":"default",overflow:"hidden",border:"1px solid #eee",backgroundSize:"cover",position:"relative"}}>
                 {!photo&&<span style={{fontSize:24,color:"#ccc"}}>+</span>}
                 {editing&&photo&&<div style={{position:"absolute",top:6,right:6,width:22,height:22,borderRadius:"50%",background:"rgba(0,0,0,0.5)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}} onClick={e=>{e.stopPropagation();const np=[...photos];np[i]=null;setPhotos(np)}}><span style={{color:"#fff",fontSize:12}}>✕</span></div>}
-                <input ref={el=>{fileRefs.current[i]=el}} type="file" accept="image/*" onChange={e=>handlePhoto(i,e)} style={{display:"none"}}/>
+                <input id={`photo-${i}`} type="file" accept="image/*" onChange={e=>handlePhoto(i,e)} style={{display:"none"}}/>
               </div>
             ))}
           </div>
-          {editing&&<button onClick={()=>fileRefs.current[0]?.click()} style={{background:"#111",border:"none",color:"#fff",fontSize:14,fontWeight:500,padding:"13px 40px",borderRadius:50,cursor:"pointer",margin:"8px 16px",width:"calc(100% - 32px)"}}>{t.add_photo}</button>}
+          {editing&&<button onClick={()=>(document.getElementById('photo-0') as HTMLInputElement)?.click()} style={{background:"#111",border:"none",color:"#fff",fontSize:14,fontWeight:500,padding:"13px 40px",borderRadius:50,cursor:"pointer",margin:"8px 16px",width:"calc(100% - 32px)"}}>{t.add_photo}</button>}
         </div>
         {/* ANON CODE */}
         <div style={{margin:"0 16px 16px",background:"#f8f8f8",borderRadius:12,padding:"12px 16px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
