@@ -167,7 +167,7 @@ export default function DatingPage(){
                     <div style={{fontFamily:"monospace",fontSize:11,color:"#7F77DD",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p.anon_code}</div>
                     <div style={{fontFamily:"monospace",fontSize:10,color:"#555470",marginTop:2}}>{p.age&&`${p.age} · `}{p.country}</div>
                   </div>
-                  <div style={{width:8,height:8,borderRadius:"50%",background:p.online?"#1D9E75":"#333",flexShrink:0,title:p.online?"online":"offline"}}/>
+                  <div style={{width:8,height:8,borderRadius:"50%",background:p.online?"#1D9E75":"#333",flexShrink:0}}/>
                 </div>
                 <p style={{fontSize:12,color:"#9F9AEC",lineHeight:1.6,marginBottom:12,display:"-webkit-box",WebkitLineClamp:3,WebkitBoxOrient:"vertical",overflow:"hidden"}}>{p.about}</p>
                 {p.interests&&p.interests.length>0&&(
