@@ -1,85 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
+import bcrypt from 'bcryptjs'
 
-// GET — получить исповеди
-export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url)
-  const lang = searchParams.get('lang') || 'tk'
-  const page = parseInt(searchParams.get('page') || '1')
-  const limit = 30
-  const offset = (page - 1) * limit
-
-  const { data, error, count } = await supabase
-    .from('confessions')
-    .select('id, anon_code, content, likes, created_at', { count: 'exact' })
-    .eq('lang', lang)
-    .order('created_at', { ascending: false })
-    .range(offset, offset + limit - 1)
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-
-  return NextResponse.json({ confessions: data, total: count, page })
+function generateAnonCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+  let code = 'ANON#'
+  for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)]
+  return code
 }
 
-// POST — создать исповедь
 export async function POST(req: NextRequest) {
-  try {
-    const session = req.cookies.get('session')
-    if (!session) {
-      return NextResponse.json({ error: 'Не авторизован' }, { status: 401 })
-    }
-
-    const { anon_code } = JSON.parse(session.value)
-    const { content, lang } = await req.json()
-
-    if (!content || content.length < 5) {
-      return NextResponse.json({ error: 'Текст слишком короткий' }, { status: 400 })
-    }
-
-    if (content.length > 300) {
-      return NextResponse.json({ error: 'Максимум 300 символов' }, { status: 400 })
-    }
-
-    const { data, error } = await supabase
-      .from('confessions')
-      .insert({ anon_code, content, lang: lang || 'tk' })
-      .select()
-      .single()
-
-    if (error) throw error
-
-    return NextResponse.json({ success: true, confession: data })
-
-  } catch (err) {
-    console.error(err)
-    return NextResponse.json({ error: 'Ошибка сервера' }, { status: 500 })
-  }
-}
-
-// PATCH — лайк исповеди
-export async function PATCH(req: NextRequest) {
-  try {
-    const { id } = await req.json()
-
-    const { data: item } = await supabase
-      .from('confessions')
-      .select('likes')
-      .eq('id', id)
-      .single()
-
-    if (!item) return NextResponse.json({ error: 'Не найдено' }, { status: 404 })
-
-    const { error } = await supabase
-      .from('confessions')
-      .update({ likes: item.likes + 1 })
-      .eq('id', id)
-
-    if (error) throw error
-
-    return NextResponse.json({ success: true, likes: item.likes + 1 })
-
-  } catch (err) {
-    console.error(err)
-    return NextResponse.json({ error: 'Ошибка сервера' }, { status: 500 })
-  }
+  const { username, password, secret_word } = await req.json()
+  if (!username || !password || !secret_word) return NextResponse.json({ error: 'All fields required' }, { status: 400 })
+  const { data: existing } = await supabase.from('users').select('id').eq('username', username.toLowerCase()).single()
+  if (existing) return NextResponse.json({ error: 'Username taken' }, { status: 409 })
+  const password_hash = await bcrypt.hash(password, 10)
+  const anon_code = generateAnonCode()
+  const { data: user, error } = await supabase.from('users').insert({ username: username.toLowerCase(), password_hash, secret_word: secret_word.toLowerCase(), anon_code }).select('id, username, anon_code').single()
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  const response = NextResponse.json({ success: true, user: { username: user.username, anon_code: user.anon_code } })
+  response.cookies.set('session', JSON.stringify({ id: user.id, username: user.username, anon_code: user.anon_code }), { httpOnly: true, secure: true, maxAge: 60 * 60 * 24 * 30 })
+  return response
 }
