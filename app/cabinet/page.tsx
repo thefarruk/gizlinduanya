@@ -55,7 +55,7 @@ export default function CabinetPage(){
     const data={name,age,city,country,about,goal,education,langs:selLangs,interests,appearance,bodyType,height,weight,smoking,alcohol,zodiac,photos}
     localStorage.setItem("gd_profile",JSON.stringify(data))
     try{
-      await fetch("/api/profiles",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({about,age:parseInt(age)||null,city,lang,about,interests,goal})})
+      await fetch("/api/profiles",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({about,age:parseInt(age)||null,city,lang,interests,goal})})
     }catch(e){console.log("profile save error",e)}
     setSaved(true);setTimeout(()=>{setSaved(false);setEditing(false)},1500)
   }
