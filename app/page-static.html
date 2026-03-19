@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GizlinDünya — Анонимная платформа</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=IBM+Plex+Mono:wght@300;400;500&family=Noto+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #07070f;
+    --bg2: #0d0d1a;
+    --bg3: #12121f;
+    --purple: #7F77DD;
+    --purple-dim: #534AB7;
+    --teal: #1D9E75;
+    --teal-light: #5DCAA5;
+    --text: #EEEDFE;
+    --text-muted: #9F9AEC;
+    --text-dim: #555470;
+    --border: rgba(127,119,221,0.15);
+    --border-hover: rgba(127,119,221,0.35);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* NOISE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  /* GLOW BACKGROUNDS */
+  .glow-left {
+    position: fixed;
+    top: -200px;
+    left: -200px;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(127,119,221,0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .glow-right {
+    position: fixed;
+    bottom: -200px;
+    right: -200px;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(29,158,117,0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* NAVBAR */
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(7,7,15,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: 2px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-psi {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: var(--purple);
+  }
+
+  .lang-switcher {
+    display: flex;
+    gap: 4px;
+  }
+
+  .lang-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 1px;
+  }
+
+  .lang-btn:hover, .lang-btn.active {
+    border-color: var(--purple);
+    color: var(--purple);
+    background: rgba(127,119,221,0.08);
+  }
+
+  .nav-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .btn-login {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    padding: 8px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-login:hover {
+    border-color: var(--purple-dim);
+    color: var(--text);
+  }
+
+  .btn-register {
+    background: var(--purple-dim);
+    border: 1px solid var(--purple);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    padding: 8px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-register:hover {
+    background: var(--purple);
+  }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    z-index: 1;
+    padding: 140px 24px 80px;
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .hero-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--teal-light);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.2s;
+  }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(36px, 6vw, 72px);
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.4s;
+  }
+
+  .hero h1 span {
+    color: var(--purple);
+  }
+
+  .hero-sub {
+    font-size: 16px;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 40px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.6s;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.8s;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--purple-dim), var(--purple));
+    border: none;
+    color: white;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    padding: 14px 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    letter-spacing: 1px;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(127,119,221,0.3);
+  }
+
+  .btn-secondary {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    padding: 14px 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    letter-spacing: 1px;
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--teal);
+    color: var(--teal-light);
+  }
+
+  /* STATS */
+  .stats {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    gap: 48px;
+    padding: 40px 24px;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 1s;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    color: var(--purple);
+    display: block;
+  }
+
+  .stat-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+  }
+
+  /* DIVIDER */
+  .divider {
+    position: relative;
+    z-index: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 20px 24px;
+  }
+
+  /* SECTIONS GRID */
+  .sections-title {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 60px 24px 40px;
+  }
+
+  .sections-title h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(24px, 4vw, 42px);
+    margin-bottom: 12px;
+  }
+
+  .sections-title p {
+    color: var(--text-muted);
+    font-size: 14px;
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 1px;
+  }
+
+  .grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    padding: 0 24px 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(127,119,221,0.05) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .card:hover {
+    border-color: var(--border-hover);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+  }
+
+  .card:hover::before {
+    opacity: 1;
+  }
+
+  .card-icon {
+    font-size: 28px;
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    margin-bottom: 10px;
+    color: var(--text);
+  }
+
+  .card-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  .card-badge {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+  }
+
+  .badge-hot {
+    background: rgba(220,50,50,0.15);
+    color: #ff6b6b;
+    border: 1px solid rgba(220,50,50,0.2);
+  }
+
+  .badge-new {
+    background: rgba(29,158,117,0.15);
+    color: var(--teal-light);
+    border: 1px solid rgba(29,158,117,0.2);
+  }
+
+  .badge-popular {
+    background: rgba(127,119,221,0.15);
+    color: var(--purple);
+    border: 1px solid rgba(127,119,221,0.2);
+  }
+
+  /* LIVE FEED */
+  .live-section {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  .live-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .live-dot {
+    width: 8px;
+    height: 8px;
+    background: #ff6b6b;
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+  }
+
+  .live-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: var(--text-muted);
+  }
+
+  .feed-item {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 12px;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+
+  .feed-item:hover {
+    border-color: var(--border-hover);
+    background: var(--bg3);
+  }
+
+  .feed-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .feed-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--purple-dim), var(--teal));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .feed-user {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--purple);
+  }
+
+  .feed-time {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-left: auto;
+  }
+
+  .feed-text {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  .feed-reactions {
+    display: flex;
+    gap: 16px;
+    margin-top: 14px;
+  }
+
+  .reaction {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+
+  .reaction:hover {
+    color: var(--purple);
+  }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(7,7,15,0.9);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+  }
+
+  .modal-overlay.open {
+    display: flex;
+  }
+
+  .modal {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px;
+    width: 90%;
+    max-width: 420px;
+    position: relative;
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 20px;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+
+  .modal-close:hover { color: var(--text); }
+
+  .modal h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+
+  .modal-sub {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    margin-bottom: 28px;
+  }
+
+  .input-group {
+    margin-bottom: 16px;
+  }
+
+  .input-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .input-field {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .input-field:focus {
+    border-color: var(--purple);
+  }
+
+  .modal-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--purple-dim), var(--purple));
+    border: none;
+    color: white;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    padding: 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 8px;
+    letter-spacing: 1px;
+    transition: opacity 0.2s;
+  }
+
+  .modal-btn:hover { opacity: 0.85; }
+
+  .modal-switch {
+    text-align: center;
+    margin-top: 20px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  .modal-switch a {
+    color: var(--purple);
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .anon-note {
+    background: rgba(29,158,117,0.08);
+    border: 1px solid rgba(29,158,117,0.15);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--teal-light);
+    letter-spacing: 0.5px;
+    line-height: 1.6;
+  }
+
+  /* FOOTER */
+  footer {
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid var(--border);
+    padding: 40px 24px;
+    text-align: center;
+  }
+
+  .footer-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    color: var(--purple);
+    margin-bottom: 12px;
+  }
+
+  .footer-text {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+  }
+
+  /* DAILY QUESTION */
+  .daily-section {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: 0 auto 60px;
+    padding: 0 24px;
+  }
+
+  .daily-card {
+    background: linear-gradient(135deg, rgba(127,119,221,0.08), rgba(29,158,117,0.05));
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 36px;
+    text-align: center;
+  }
+
+  .daily-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--teal-light);
+    margin-bottom: 16px;
+  }
+
+  .daily-question {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(18px, 3vw, 26px);
+    margin-bottom: 24px;
+    line-height: 1.4;
+  }
+
+  .daily-input {
+    width: 100%;
+    background: rgba(7,7,15,0.6);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Noto Sans', sans-serif;
+    font-size: 14px;
+    padding: 14px 16px;
+    border-radius: 8px;
+    outline: none;
+    margin-bottom: 12px;
+    transition: border-color 0.2s;
+    resize: none;
+    height: 80px;
+  }
+
+  .daily-input:focus { border-color: var(--purple); }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  /* MOBILE */
+  @media (max-width: 600px) {
+    nav { padding: 12px 16px; }
+    .lang-switcher { display: none; }
+    .hero { padding: 100px 16px 60px; }
+    .grid { padding: 0 16px 40px; }
+    .modal { padding: 28px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="glow-left"></div>
+<div class="glow-right"></div>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="logo">
+    <span class="logo-psi">Ψ</span>
+    <span data-key="brand">GizlinDünya</span>
+  </div>
+  <div class="lang-switcher">
+    <button class="lang-btn active" onclick="setLang('tk')">TK</button>
+    <button class="lang-btn" onclick="setLang('ru')">RU</button>
+    <button class="lang-btn" onclick="setLang('tr')">TR</button>
+    <button class="lang-btn" onclick="setLang('en')">EN</button>
+  </div>
+  <div class="nav-actions">
+    <button class="btn-login" onclick="openModal('login')" data-key="login">Войти</button>
+    <button class="btn-register" onclick="openModal('register')" data-key="register">Анонимно войти</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <p class="hero-tag" data-key="hero_tag">Анонимная платформа</p>
+  <h1 data-key="hero_title">Твои <span>тайны</span> здесь в безопасности</h1>
+  <p class="hero-sub" data-key="hero_sub">Истории. Знакомства. Исповеди. Всё анонимно. Без имени, без телефона, без следов.</p>
+  <div class="hero-actions">
+    <button class="btn-primary" onclick="openModal('register')" data-key="hero_cta">Войти анонимно</button>
+    <button class="btn-secondary" data-key="hero_explore">Смотреть истории</button>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat">
+    <span class="stat-num" id="stat1">0</span>
+    <span class="stat-label" data-key="stat_users">пользователей</span>
+  </div>
+  <div class="stat">
+    <span class="stat-num" id="stat2">0</span>
+    <span class="stat-label" data-key="stat_stories">историй сегодня</span>
+  </div>
+  <div class="stat">
+    <span class="stat-num" id="stat3">0</span>
+    <span class="stat-label" data-key="stat_online">онлайн сейчас</span>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- SECTIONS -->
+<div class="sections-title">
+  <h2 data-key="sections_title">Что здесь есть</h2>
+  <p data-key="sections_sub">выбери раздел</p>
+</div>
+
+<div class="grid">
+  <div class="card" onclick="openModal('register')">
+    <span class="card-icon">🔥</span>
+    <h3 class="card-title" data-key="card1_title">Анонимные истории</h3>
+    <p class="card-desc" data-key="card1_desc">Расскажи то, что не можешь рассказать никому. Читай чужие тайны. Голосуй. Комментируй.</p>
+    <span class="card-badge badge-hot" data-key="card1_badge">ГОРЯЧЕЕ</span>
+  </div>
+  <div class="card" onclick="openModal('register')">
+    <span class="card-icon">💬</span>
+    <h3 class="card-title" data-key="card2_title">Анонимные знакомства</h3>
+    <p class="card-desc" data-key="card2_desc">Находи людей с похожими мыслями. Пиши первым анонимно. Никто не узнает кто ты.</p>
+    <span class="card-badge badge-popular" data-key="card2_badge">ПОПУЛЯРНО</span>
+  </div>
+  <div class="card" onclick="openModal('register')">
+    <span class="card-icon">🤫</span>
+    <h3 class="card-title" data-key="card3_title">Исповеди</h3>
+    <p class="card-desc" data-key="card3_desc">Один абзац. Одна тайна. Анонимно. Люди читают, реагируют, но не знают кто ты.</p>
+    <span class="card-badge badge-new" data-key="card3_badge">НОВОЕ</span>
+  </div>
+  <div class="card" onclick="openModal('register')">
+    <span class="card-icon">❓</span>
+    <h3 class="card-title" data-key="card4_title">Задай вопрос</h3>
+    <p class="card-desc" data-key="card4_desc">Спроси то, что стесняешься спросить вслух. Получи честные анонимные ответы.</p>
+    <span class="card-badge badge-popular" data-key="card4_badge">ПОПУЛЯРНО</span>
+  </div>
+  <div class="card" onclick="openModal('register')">
+    <span class="card-icon">⚡</span>
+    <h3 class="card-title" data-key="card5_title">Кто виноват?</h3>
+    <p class="card-desc" data-key="card5_desc">Опиши ситуацию — люди голосуют кто прав. Честно и анонимно. Без осуждения.</p>
+    <span class="card-badge badge-hot" data-key="card5_badge">ГОРЯЧЕЕ</span>
+  </div>
+  <div class="card" onclick="openModal('register')">
+    <span class="card-icon">📔</span>
+    <h3 class="card-title" data-key="card6_title">Анонимный дневник</h3>
+    <p class="card-desc" data-key="card6_desc">Пиши только для себя. Или открой для всех анонимно. Твоя история, твои правила.</p>
+    <span class="card-badge badge-new" data-key="card6_badge">НОВОЕ</span>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DAILY QUESTION -->
+<div class="daily-section">
+  <div class="daily-card">
+    <p class="daily-label" data-key="daily_label">ВОПРОС ДНЯ</p>
+    <h3 class="daily-question" data-key="daily_q">Что вы скрываете от самых близких людей?</h3>
+    <textarea class="daily-input" data-key="daily_placeholder" placeholder="Ответь анонимно..."></textarea>
+    <button class="btn-primary" onclick="openModal('register')" data-key="daily_btn">Ответить анонимно</button>
+  </div>
+</div>
+
+<!-- LIVE FEED -->
+<div class="live-section">
+  <div class="live-header">
+    <div class="live-dot"></div>
+    <span class="live-title" data-key="live_title">ПРЯМО СЕЙЧАС</span>
+  </div>
+
+  <div class="feed-item">
+    <div class="feed-meta">
+      <div class="feed-avatar">A7</div>
+      <span class="feed-user">Anon#4821</span>
+      <span class="feed-time">2 мин назад</span>
+    </div>
+    <p class="feed-text" data-key="feed1">Три года я молчал об этом. Сегодня наконец написал здесь. Стало легче...</p>
+    <div class="feed-reactions">
+      <span class="reaction">♥ 47</span>
+      <span class="reaction">💬 12</span>
+      <span class="reaction">🔥 8</span>
+    </div>
+  </div>
+
+  <div class="feed-item">
+    <div class="feed-meta">
+      <div class="feed-avatar">K3</div>
+      <span class="feed-user">Anon#2193</span>
+      <span class="feed-time">5 мин назад</span>
+    </div>
+    <p class="feed-text" data-key="feed2">Я влюблён в человека которого никогда не встречал. Мы общаемся только здесь.</p>
+    <div class="feed-reactions">
+      <span class="reaction">♥ 83</span>
+      <span class="reaction">💬 29</span>
+      <span class="reaction">🔥 15</span>
+    </div>
+  </div>
+
+  <div class="feed-item">
+    <div class="feed-meta">
+      <div class="feed-avatar">M9</div>
+      <span class="feed-user">Anon#7754</span>
+      <span class="feed-time">11 мин назад</span>
+    </div>
+    <p class="feed-text" data-key="feed3">Семья думает что я счастлив. Никто не знает что происходит на самом деле.</p>
+    <div class="feed-reactions">
+      <span class="reaction">♥ 124</span>
+      <span class="reaction">💬 41</span>
+      <span class="reaction">🔥 22</span>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Ψ GizlinDünya</div>
+  <p class="footer-text" data-key="footer_text">© 2025 — анонимно · безопасно · без следов</p>
+</footer>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<script>
+// TRANSLATIONS
+const lang = {
+  tk: {
+    brand: 'GizlinDünya',
+    hero_tag: 'Anonim platforma',
+    hero_title: 'Seniň <span style="color:var(--purple)">syrlaryn</span> bu ýerde howpsuz',
+    hero_sub: 'Hekaýalar. Tanyşlyk. Boýun almalar. Hemmesi anonim. Atsyz, telefonsyz.',
+    hero_cta: 'Anonim gir',
+    hero_explore: 'Hekaýalary gör',
+    stat_users: 'ulanyjy',
+    stat_stories: 'şu gün hekaýalar',
+    stat_online: 'onlaýn häzir',
+    sections_title: 'Bu ýerde näme bar',
+    sections_sub: 'bölüm saýla',
+    card1_title: 'Anonim hekaýalar', card1_desc: 'Hiç kimä aýdyp bilmeýän zadyňy aýt.', card1_badge: 'GYZGYN',
+    card2_title: 'Anonim tanyşlyk', card2_desc: 'Meňzeş adamlary tap. Anonim ýaz.', card2_badge: 'MEŞHUR',
+    card3_title: 'Boýun almalar', card3_desc: 'Bir syr. Anonim. Hiç kim bilmez.', card3_badge: 'TÄZE',
+    card4_title: 'Sorag ber', card4_desc: 'Anonim sorag ber, dogry jogap al.', card4_badge: 'MEŞHUR',
+    card5_title: 'Kim günäkär?', card5_desc: 'Ýagdaýy aýt, adamlar ses berýär.', card5_badge: 'GYZGYN',
+    card6_title: 'Anonim gündelik', card6_desc: 'Diňe özüň üçin ýaz.', card6_badge: 'TÄZE',
+    daily_label: 'GÜNÜŇ SORAGY',
+    daily_q: 'Iň ýakyn adamlaryňdan näme gizleýärsiň?',
+    daily_placeholder: 'Anonim jogap ber...',
+    daily_btn: 'Anonim jogap ber',
+    live_title: 'ŞU WAGT',
+    feed1: 'Üç ýyl bäri dymyp geldim. Bu gün ilkinji gezek ýazdym. Ýeňil boldy...',
+    feed2: 'Hiç duşuşmadyk adama aşyk boldym. Diňe şu ýerde gürleşýäris.',
+    feed3: 'Maşgalam bagtlydyryn öýdýär. Hakykatda näme bolýanyny hiç kim bilenok.',
+    login: 'Gir', register: 'Anonim gir',
+    footer_text: '© 2025 — anonim · howpsuz · yzyz ýok'
+  },
+  ru: {
+    brand: 'GizlinDünya',
+    hero_tag: 'Анонимная платформа',
+    hero_title: 'Твои <span style="color:var(--purple)">тайны</span> здесь в безопасности',
+    hero_sub: 'Истории. Знакомства. Исповеди. Всё анонимно. Без имени, без телефона, без следов.',
+    hero_cta: 'Войти анонимно',
+    hero_explore: 'Смотреть истории',
+    stat_users: 'пользователей',
+    stat_stories: 'историй сегодня',
+    stat_online: 'онлайн сейчас',
+    sections_title: 'Что здесь есть',
+    sections_sub: 'выбери раздел',
+    card1_title: 'Анонимные истории', card1_desc: 'Расскажи то, что не можешь рассказать никому. Читай чужие тайны. Голосуй. Комментируй.', card1_badge: 'ГОРЯЧЕЕ',
+    card2_title: 'Анонимные знакомства', card2_desc: 'Находи людей с похожими мыслями. Пиши первым анонимно. Никто не узнает кто ты.', card2_badge: 'ПОПУЛЯРНО',
+    card3_title: 'Исповеди', card3_desc: 'Один абзац. Одна тайна. Анонимно. Люди читают, реагируют, но не знают кто ты.', card3_badge: 'НОВОЕ',
+    card4_title: 'Задай вопрос', card4_desc: 'Спроси то, что стесняешься спросить вслух. Получи честные анонимные ответы.', card4_badge: 'ПОПУЛЯРНО',
+    card5_title: 'Кто виноват?', card5_desc: 'Опиши ситуацию — люди голосуют кто прав. Честно и анонимно. Без осуждения.', card5_badge: 'ГОРЯЧЕЕ',
+    card6_title: 'Анонимный дневник', card6_desc: 'Пиши только для себя. Или открой для всех анонимно. Твоя история, твои правила.', card6_badge: 'НОВОЕ',
+    daily_label: 'ВОПРОС ДНЯ',
+    daily_q: 'Что вы скрываете от самых близких людей?',
+    daily_placeholder: 'Ответь анонимно...',
+    daily_btn: 'Ответить анонимно',
+    live_title: 'ПРЯМО СЕЙЧАС',
+    feed1: 'Три года я молчал об этом. Сегодня наконец написал здесь. Стало легче...',
+    feed2: 'Я влюблён в человека которого никогда не встречал. Мы общаемся только здесь.',
+    feed3: 'Семья думает что я счастлив. Никто не знает что происходит на самом деле.',
+    login: 'Войти', register: 'Анонимно войти',
+    footer_text: '© 2025 — анонимно · безопасно · без следов'
+  },
+  tr: {
+    brand: 'GizlinDünya',
+    hero_tag: 'Anonim platform',
+    hero_title: 'Sırların burada <span style="color:var(--purple)">güvende</span>',
+    hero_sub: 'Hikayeler. Tanışmalar. İtiraflar. Hepsi anonim. İsimsiz, telefonsuz, iz bırakmadan.',
+    hero_cta: 'Anonim giriş',
+    hero_explore: 'Hikayelere bak',
+    stat_users: 'kullanıcı',
+    stat_stories: 'bugün hikaye',
+    stat_online: 'şu an çevrimiçi',
+    sections_title: 'Burada ne var',
+    sections_sub: 'bölüm seç',
+    card1_title: 'Anonim hikayeler', card1_desc: 'Kimseye söyleyemediğini anlat. Başkalarının sırlarını oku.', card1_badge: 'SICAK',
+    card2_title: 'Anonim tanışma', card2_desc: 'Benzer düşünen insanları bul. Anonim yaz.', card2_badge: 'POPÜLER',
+    card3_title: 'İtiraflar', card3_desc: 'Bir paragraf. Bir sır. Anonim. Kimse bilmez.', card3_badge: 'YENİ',
+    card4_title: 'Soru sor', card4_desc: 'Sesli soramadığını sor. Dürüst anonim cevaplar al.', card4_badge: 'POPÜLER',
+    card5_title: 'Kim suçlu?', card5_desc: 'Durumu anlat, insanlar oylar. Dürüst ve anonim.', card5_badge: 'SICAK',
+    card6_title: 'Anonim günlük', card6_desc: 'Sadece kendin için yaz. Ya da herkese anonim aç.', card6_badge: 'YENİ',
+    daily_label: 'GÜNÜN SORUSU',
+    daily_q: 'En yakınlarınızdan ne saklıyorsunuz?',
+    daily_placeholder: 'Anonim cevapla...',
+    daily_btn: 'Anonim cevapla',
+    live_title: 'ŞU AN',
+    feed1: 'Üç yıldır sustum. Bugün sonunda burada yazdım. Rahatladım...',
+    feed2: 'Hiç tanışmadığım birine aşık oldum. Sadece burada konuşuyoruz.',
+    feed3: 'Ailem mutlu olduğumu sanıyor. Gerçekte ne olduğunu kimse bilmiyor.',
+    login: 'Giriş', register: 'Anonim giriş',
+    footer_text: '© 2025 — anonim · güvenli · iz yok'
+  },
+  en: {
+    brand: 'GizlinDünya',
+    hero_tag: 'Anonymous platform',
+    hero_title: 'Your <span style="color:var(--purple)">secrets</span> are safe here',
+    hero_sub: 'Stories. Connections. Confessions. All anonymous. No name, no phone, no trace.',
+    hero_cta: 'Enter anonymously',
+    hero_explore: 'Browse stories',
+    stat_users: 'users',
+    stat_stories: 'stories today',
+    stat_online: 'online now',
+    sections_title: 'What\'s here',
+    sections_sub: 'choose a section',
+    card1_title: 'Anonymous stories', card1_desc: 'Tell what you can\'t tell anyone. Read others\' secrets. Vote. Comment.', card1_badge: 'HOT',
+    card2_title: 'Anonymous dating', card2_desc: 'Find people with similar thoughts. Write anonymously. Nobody knows who you are.', card2_badge: 'POPULAR',
+    card3_title: 'Confessions', card3_desc: 'One paragraph. One secret. Anonymous. People react but never know who you are.', card3_badge: 'NEW',
+    card4_title: 'Ask a question', card4_desc: 'Ask what you\'re afraid to ask out loud. Get honest anonymous answers.', card4_badge: 'POPULAR',
+    card5_title: 'Who\'s guilty?', card5_desc: 'Describe a situation — people vote who\'s right. Honest and anonymous.', card5_badge: 'HOT',
+    card6_title: 'Anonymous diary', card6_desc: 'Write only for yourself. Or share anonymously. Your story, your rules.', card6_badge: 'NEW',
+    daily_label: 'QUESTION OF THE DAY',
+    daily_q: 'What are you hiding from the people closest to you?',
+    daily_placeholder: 'Answer anonymously...',
+    daily_btn: 'Answer anonymously',
+    live_title: 'RIGHT NOW',
+    feed1: 'Three years I kept silent about this. Today I finally wrote it here. I feel lighter...',
+    feed2: 'I\'m in love with someone I\'ve never met. We only talk here.',
+    feed3: 'My family thinks I\'m happy. Nobody knows what\'s really happening.',
+    login: 'Login', register: 'Enter anonymously',
+    footer_text: '© 2025 — anonymous · safe · no trace'
+  }
+};
+
+let currentLang = 'tk';
+
+function setLang(l) {
+  currentLang = l;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.lang-btn[onclick="setLang('${l}')"]`).classList.add('active');
+  const t = lang[l];
+  document.querySelectorAll('[data-key]').forEach(el => {
+    const key = el.getAttribute('data-key');
+    if (t[key] !== undefined) {
+      if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+        el.placeholder = t[key];
+      } else {
+        el.innerHTML = t[key];
+      }
+    }
+  });
+}
+
+// COUNTER ANIMATION
+function animateCounter(el, target, suffix='') {
+  let start = 0;
+  const duration = 1500;
+  const step = target / (duration / 16);
+  const timer = setInterval(() => {
+    start += step;
+    if (start >= target) { start = target; clearInterval(timer); }
+    el.textContent = Math.floor(start).toLocaleString() + suffix;
+  }, 16);
+}
+
+setTimeout(() => {
+  animateCounter(document.getElementById('stat1'), 12847);
+  animateCounter(document.getElementById('stat2'), 342);
+  animateCounter(document.getElementById('stat3'), 1203);
+}, 1000);
+
+// MODAL
+function openModal(type) {
+  const t = lang[currentLang];
+  const isLogin = type === 'login';
+  document.getElementById('modal-content').innerHTML = `
+    <h3>${isLogin ? t.login : t.register}</h3>
+    <p class="modal-sub">GIZLINDUANYA · ANONIM</p>
+    <div class="anon-note">🔒 ${currentLang === 'tk' ? 'Email ýok. Telefon ýok. Diňe login we parol.' : currentLang === 'ru' ? 'Без email. Без телефона. Только логин и пароль.' : currentLang === 'tr' ? 'Email yok. Telefon yok. Sadece kullanıcı adı ve şifre.' : 'No email. No phone. Just username and password.'}</div>
+    <div class="input-group">
+      <label class="input-label">${currentLang === 'tk' ? 'ULANYJY ADY' : currentLang === 'ru' ? 'ЛОГИН' : currentLang === 'tr' ? 'KULLANICI ADI' : 'USERNAME'}</label>
+      <input type="text" class="input-field" placeholder="${currentLang === 'tk' ? 'anon_####' : currentLang === 'ru' ? 'anon_####' : 'anon_####'}">
+    </div>
+    <div class="input-group">
+      <label class="input-label">${currentLang === 'tk' ? 'PAROL' : currentLang === 'ru' ? 'ПАРОЛЬ' : currentLang === 'tr' ? 'ŞİFRE' : 'PASSWORD'}</label>
+      <input type="password" class="input-field" placeholder="••••••••">
+    </div>
+    ${!isLogin ? `<div class="input-group">
+      <label class="input-label">${currentLang === 'tk' ? 'GIZLIN SÖZ (ýatdan çykanda)' : currentLang === 'ru' ? 'СЕКРЕТНОЕ СЛОВО (если забудете)' : currentLang === 'tr' ? 'GİZLİ KELIME (unutursanız)' : 'SECRET WORD (if you forget)'}</label>
+      <input type="text" class="input-field" placeholder="${currentLang === 'tk' ? 'diňe sen bilersiň...' : currentLang === 'ru' ? 'только ты знаешь...' : currentLang === 'tr' ? 'sadece sen bilirsin...' : 'only you know...'}">
+    </div>` : ''}
+    <button class="modal-btn">${isLogin ? t.login : t.register}</button>
+    <div class="modal-switch">
+      ${isLogin
+        ? `${currentLang === 'ru' ? 'Нет аккаунта?' : currentLang === 'tr' ? 'Hesabın yok mu?' : currentLang === 'en' ? 'No account?' : 'Hasabyň ýokmy?'} <a onclick="openModal('register')">${t.register}</a>`
+        : `${currentLang === 'ru' ? 'Уже есть аккаунт?' : currentLang === 'tr' ? 'Hesabın var mı?' : currentLang === 'en' ? 'Already have account?' : 'Hasabyň barmy?'} <a onclick="openModal('login')">${t.login}</a>`
+      }
+    </div>
+  `;
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+}
+
+document.getElementById('modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// SET DEFAULT LANG
+setLang('tk');
+</script>
+</body>
+</html>
