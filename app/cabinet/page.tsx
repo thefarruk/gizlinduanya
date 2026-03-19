@@ -113,7 +113,7 @@ export default function CabinetPage(){
               <div key={i} onClick={()=>editing&&fileRefs.current[i]?.click()} style={{gridColumn:i===0?"1":"auto",gridRow:i===0?"1 / 3":"auto",background:photo?`url(${photo}) center/cover`:"#f5f5f5",borderRadius:12,aspectRatio:i===0?"1/1.4":"1/1",display:"flex",alignItems:"center",justifyContent:"center",cursor:editing?"pointer":"default",overflow:"hidden",border:"1px solid #eee",backgroundSize:"cover",position:"relative"}}>
                 {!photo&&<span style={{fontSize:24,color:"#ccc"}}>+</span>}
                 {editing&&photo&&<div style={{position:"absolute",top:6,right:6,width:22,height:22,borderRadius:"50%",background:"rgba(0,0,0,0.5)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}} onClick={e=>{e.stopPropagation();const np=[...photos];np[i]=null;setPhotos(np)}}><span style={{color:"#fff",fontSize:12}}>✕</span></div>}
-                <input ref={el=>fileRefs.current[i]=el} type="file" accept="image/*" onChange={e=>handlePhoto(i,e)} style={{display:"none"}}/>
+                <input ref={el=>{fileRefs.current[i]=el}} type="file" accept="image/*" onChange={e=>handlePhoto(i,e)} style={{display:"none"}}/>
               </div>
             ))}
           </div>
