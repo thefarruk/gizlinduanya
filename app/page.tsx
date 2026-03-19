@@ -48,6 +48,7 @@ export default function Home(){
       if(!r.ok)return showT(d.error||t.et,"err")
       localStorage.setItem("gd_user",JSON.stringify(d.user))
       setUser(d.user);setModal(null);showT(t.sr)
+      setTimeout(()=>window.location.href="/cabinet",1000)
     }finally{setLoading(false)}
   }
   async function doLogin(){
