@@ -83,7 +83,7 @@ export default function DatingPage(){
   async function saveProfile(){
     if(!user)return
     try{
-      const r=await fetch("/api/profiles",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({about:myAbout,age:parseInt(myAge)||null,city:myCity,country:myCountry,gender:myGender,zodiac:myZodiac,height:parseInt(myHeight)||null,weight:parseInt(myWeight)||null,smoking:mySmoking,alcohol:myAlcohol,goal:myGoals,interests:myInterests,lang})})
+      const r=await fetch("/api/profiles",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({anon_code:user?.anon_code,about:myAbout,age:parseInt(myAge)||null,city:myCity,country:myCountry,gender:myGender,zodiac:myZodiac,height:parseInt(myHeight)||null,weight:parseInt(myWeight)||null,smoking:mySmoking,alcohol:myAlcohol,goal:myGoals,interests:myInterests,lang})})
       const d=await r.json()
       if(d.success){setSaved(true);await loadProfiles();setTimeout(()=>{setSaved(false);setView("list")},1000)}
     }catch(e){console.log(e)}

@@ -57,7 +57,7 @@ export default function CabinetPage(){
       await fetch("/api/profiles",{
         method:"POST",
         headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({about,age:parseInt(age)||null,city,country,interests,goal,lang})
+        body:JSON.stringify({anon_code:user?.anon_code,about,age:parseInt(age)||null,city,country,interests,goal,lang})
       })
     }catch(e){console.log(e)}
     setSaved(true);setTimeout(()=>{setSaved(false);setEditing(false)},1500)
