@@ -50,9 +50,16 @@ export default function CabinetPage(){
     const filled=fields.filter(Boolean).length+selLangs.length+interests.length+(photos[0]?2:0)
     return Math.min(Math.round((filled/20)*100),100)
   }
-  function saveProfile(){
+  async function saveProfile(){
     const data={name,age,city,country,about,goal,education,langs:selLangs,interests,appearance,bodyType,height,weight,smoking,alcohol,zodiac,photos}
     localStorage.setItem("gd_profile",JSON.stringify(data))
+    try{
+      await fetch("/api/profiles",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({about,age:parseInt(age)||null,city,country,interests,goal,lang})
+      })
+    }catch(e){console.log(e)}
     setSaved(true);setTimeout(()=>{setSaved(false);setEditing(false)},1500)
   }
   function handlePhoto(idx:number,e:React.ChangeEvent<HTMLInputElement>){
