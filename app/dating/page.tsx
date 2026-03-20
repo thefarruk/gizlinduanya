@@ -63,7 +63,7 @@ export default function DatingPage(){
   useEffect(()=>{
     const s=localStorage.getItem("gd_user")
     if(s)setUser(JSON.parse(s))
-    fetch("/api/profiles").then(r=>r.json()).then(d=>{if(d.profiles&&d.profiles.length>0)setProfiles(d.profiles)}).catch(()=>{})
+    fetch("/api/profiles").then(r=>r.json()).then(d=>{if(d.profiles&&d.profiles.length>0)setProfiles([...SAMPLE,...d.profiles])}).catch(()=>{})
   },[])
   useEffect(()=>{
     let r=[...profiles]
