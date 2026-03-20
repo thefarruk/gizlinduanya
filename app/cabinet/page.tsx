@@ -59,7 +59,7 @@ export default function CabinetPage(){
         headers:{"Content-Type":"application/json"},
         body:JSON.stringify({anon_code:user?.anon_code,about,age:parseInt(age)||null,city,country,interests,goal,lang,gender:myGender,zodiac,height:parseInt(height)||null,weight:parseInt(weight)||null,smoking,alcohol})
       })
-    }catch(e){console.log(e)}
+    }catch(e){console.error("SAVE ERROR:",e);alert("Error: "+String(e))}
     setSaved(true);setTimeout(()=>{setSaved(false);setEditing(false)},1500)
   }
   function handlePhoto(idx:number,e:React.ChangeEvent<HTMLInputElement>){
