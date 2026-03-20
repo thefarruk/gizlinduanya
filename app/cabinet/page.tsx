@@ -97,7 +97,7 @@ export default function CabinetPage(){
             <button key={lg} onClick={()=>setLang(lg)} style={{background:lang===lg?"#111":"none",border:"1px solid",borderColor:lang===lg?"#111":"#ddd",color:lang===lg?"#fff":"#888",fontFamily:"monospace",fontSize:10,padding:"3px 7px",borderRadius:3,cursor:"pointer"}}>{lg.toUpperCase()}</button>
           ))}
         </div>
-        <button onClick={()=>setEditing(!editing)} style={{background:"none",border:"none",color:"#7F77DD",fontSize:14,fontWeight:500,cursor:"pointer"}}>{editing?t.save:t.edit}</button>
+        <button onClick={()=>editing?saveProfile():setEditing(true)} style={{background:"none",border:"none",color:"#7F77DD",fontSize:14,fontWeight:500,cursor:"pointer"}}>{editing?t.save:t.edit}</button>
       </nav>
       <div style={{maxWidth:500,margin:"0 auto",padding:"60px 0 80px"}}>
         {/* HEADER */}
