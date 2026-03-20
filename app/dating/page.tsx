@@ -81,7 +81,7 @@ export default function DatingPage(){
   function toggleArr(arr:string[],setArr:(a:string[])=>void,val:string){setArr(arr.includes(val)?arr.filter((x:string)=>x!==val):[...arr,val])}
   function handlePhoto(e:React.ChangeEvent<HTMLInputElement>){const f=e.target.files?.[0];if(f){const r=new FileReader();r.onload=ev=>setMyPhoto(ev.target?.result as string);r.readAsDataURL(f)}}
   async function saveProfile(){
-    if(!user)return
+    if(!user){alert("Сначала войдите в аккаунт");window.location.href="/";return}
     try{
       const r=await fetch("/api/profiles",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({anon_code:user?.anon_code,about:myAbout,age:parseInt(myAge)||null,city:myCity,country:myCountry,gender:myGender,zodiac:myZodiac,height:parseInt(myHeight)||null,weight:parseInt(myWeight)||null,smoking:mySmoking,alcohol:myAlcohol,goal:myGoals,interests:myInterests,lang})})
       const d=await r.json()
