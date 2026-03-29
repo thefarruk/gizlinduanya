@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Analytics } from '@vercel/analytics/next'
 
 export const metadata: Metadata = {
   title: 'GizlinDunya',
@@ -10,6 +11,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="tk">
       <body style={{ margin: 0, background: '#07070f', color: '#EEEDFE' }}>
         {children}
+        <Analytics />
       </body>
     </html>
   )
